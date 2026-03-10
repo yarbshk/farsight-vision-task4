@@ -16,7 +16,7 @@ Optional (will be automatically installed if missing):
 
 ## Live Demo
 
-Run on RunPod.io:
+Run task on RunPod.io:
 ```
 git clone https://github.com/yarbshk/farsight-vision-task4
 ./farsight-vision-task4/run-task.sh

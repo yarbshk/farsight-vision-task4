@@ -3,7 +3,7 @@ set -e
 
 miniconda_root=~/miniconda3
 
-if ! command -v conda &> /dev/null; then
+if [ ! -d "$miniconda_root" ]; then
     miniconda_sh=/tmp/miniconda3.sh
     wget -O "$miniconda_sh" https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     chmod u+x "$miniconda_sh"

@@ -14,4 +14,4 @@ if ! command -v ffmpeg &> /dev/null; then
     apt install -y ffmpeg
 fi
 
-ffmpeg -framerate 10 -pattern_type glob -i "$input_pattern" -c:v libx264 -crf 0 -pix_fmt yuv420p "$output_file"
+ffmpeg -framerate 1 -pattern_type glob -i "$input_pattern" -c:v libx264 -pix_fmt yuv420p -vf "scale=1920:-2" "$output_file"
