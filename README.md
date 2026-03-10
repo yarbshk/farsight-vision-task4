@@ -1,6 +1,6 @@
 # farsight-vision-task4 (VIPE Gaussian Splatting Demo)
 
-This project helps to convert a bunch of photos of a building to a Gaussian Splatting reconstruction of the building.
+This project helps to convert a bunch of photos of a building to a 3D model of the building.
 
 ## Prerequisites
 

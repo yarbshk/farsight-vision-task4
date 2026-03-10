@@ -1,27 +1,27 @@
 #!/bin/bash
 set -e
-cd "$(dirname "${BASH_SOURCE[0]}")"
 
 if [ -z "$GOOGLE_API_KEY" ]; then
     echo "Error: GOOGLE_API_KEY environment variable is not set"
     exit 1
 fi
 
+project_root=$(dirname "${BASH_SOURCE[0]}")
 vipe_dir=~/vipe
 dataset_dir=~/dataset
 dataset_video=$dataset_dir/building_360.mp4
 
-source ./setup-conda.sh
+source $project_root/setup-conda.sh
 
 # Step 1. Set up the environment and install all dependencies required to run VIPE
 if [ ! -d "$vipe_dir" ]; then
-    source ./install-vipe.sh "$vipe_dir"
+    source $project_root/install-vipe.sh "$vipe_dir"
 fi
 
 # Step 2. Prepare the dataset in the format required by VIPE
 if [ ! -f "$dataset_video" ]; then
-    ./download-dataset.py --folder-id 1wPpU0irWLunZCCKR5TSk_bhofioQQ8eV --output-dir "$dataset_dir"
-    ./make-video-from-dataset.sh "$dataset_dir/dji_*.jpg" "$dataset_video"
+    $project_root/download-dataset.py --folder-id 1wPpU0irWLunZCCKR5TSk_bhofioQQ8eV --output-dir "$dataset_dir"
+    $project_root/make-video-from-dataset.sh "$dataset_dir/dji_*.jpg" "$dataset_video"
 fi
 
 # Step 3. Run VIPE to obtain a Gaussian Splatting representation of the scene
