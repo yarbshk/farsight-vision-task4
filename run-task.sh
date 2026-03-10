@@ -11,9 +11,11 @@ vipe_dir=~/vipe
 dataset_dir=~/dataset
 dataset_video=$dataset_dir/building_360.mp4
 
+source ./setup-conda.sh
+
 # Step 1. Set up the environment and install all dependencies required to run VIPE
 if [ ! -d "$vipe_dir" ]; then
-    ./install-vipe.sh "$vipe_dir"
+    source ./install-vipe.sh "$vipe_dir"
 fi
 
 # Step 2. Prepare the dataset in the format required by VIPE
