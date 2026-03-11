@@ -43,6 +43,8 @@ git clone https://github.com/yarbshk/farsight-vision-task4
 
 The script will install all missing dependencies automatically.
 
+The outputs of the script execution are a Gaussian Splatting model (see `/root/nerfstudio/outputs/building_360/splat.ply`) and a fly-through video (see `/root/nerfstudio/outputs/building_360/fly-through.mp4`).
+
 ## Artifacts
 
 - Working VIPE setup (see [Live demo](https://github.com/yarbshk/farsight-vision-task4?tab=readme-ov-file#live-demo) section above)
