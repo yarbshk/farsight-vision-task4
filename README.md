@@ -18,11 +18,11 @@ The script is written in bash but not Python because it contains simple OS level
 
 Required software:
 - Ubuntu 24.04
-- Python 3.13.12
-- bash 5.2.21(1)-release
+- Python 3.11.10
+- bash 5.1.16(1)-release
 
 Optional software (will be automatically installed if missing):
-- ffmpeg 6.1.1-3ubuntu5
+- ffmpeg 4.4.2-0ubuntu0.22.04.1
 - conda 26.1.1
 - [vipe](https://github.com/nv-tlabs/vipe) latest
 
