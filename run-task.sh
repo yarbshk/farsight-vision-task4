@@ -29,9 +29,9 @@ if [ ! -d "$vipe_dir" ]; then
     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
     conda env create -f "$vipe_dir"/envs/base.yml -y
-    conda run -n vipe --no-capture-output pip install -r envs/requirements.txt \
+    conda run -n vipe --no-capture-output pip install -r "$vipe_dir"/envs/requirements.txt \
         --extra-index-url https://download.pytorch.org/whl/cu128
-    conda run -n vipe --no-capture-output pip install --no-build-isolation -e .
+    conda run -n vipe --no-capture-output pip install --no-build-isolation -e "$vipe_dir"
 fi
 
 # Step 2. Prepare the dataset in the format required by VIPE
@@ -48,9 +48,10 @@ if [ ! -f "$dataset_video" ]; then
 fi
 
 # Step 3. Run VIPE to obtain a Gaussian Splatting representation of the scene
+pushd "$vipe_dir"
 vipe_results=$vipe_dir/vipe_results
 if [ ! -d "$vipe_results" ]; then
-    conda run -n vipe --no-capture-output python "$vipe_dir"/run.py pipeline=default \
+    conda run -n vipe --no-capture-output python run.py pipeline=default \
         streams=raw_mp4_stream \
         streams.base_path="$dataset_video" \
         pipeline.output.path="$vipe_results" \
@@ -61,16 +62,17 @@ fi
 
 vipe_results_colormap=$vipe_dir/vipe_results_colmap
 if [ ! -d "$vipe_results_colormap" ]; then
-    conda run -n vipe --no-capture-output python "$vipe_dir"/scripts/vipe_to_colmap.py \
+    conda run -n vipe --no-capture-output python scripts/vipe_to_colmap.py \
         $vipe_results --sequence $dataset_sequence --output "$vipe_results_colormap"
 fi
+popd
 
 nerfstudio_workdir=~/nerfstudio
 nerfstudio_colormap=$nerfstudio_workdir/colmap
 if [ ! -d "$nerfstudio_colormap" ]; then
     mkdir -p "$nerfstudio_colormap"/colmap/sparse/0
     cp "$vipe_results_colormap/$dataset_sequence"/*.txt "$nerfstudio_colormap"/colmap/sparse/0/
-    mkdir "$nerfstudio_colormap"/images/images/
+    mkdir -p "$nerfstudio_colormap"/images/images/
     cp "$vipe_results_colormap/$dataset_sequence"/images/*.jpg "$nerfstudio_colormap"/images/images/
 fi
 
@@ -84,14 +86,15 @@ if [ ! -d "$nerfstudio_outputs" ]; then
         git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
     conda run -n nerfstudio --no-capture-output pip install nerfstudio
     conda run -n nerfstudio --no-capture-output ns-train splatfacto \
-        --data "$nerfstudio_colormap" colmap --downscale-factor 1 \
-        --output-dir "$nerfstudio_outputs" --viewer.quit-on-train-completion True
+        --output-dir "$nerfstudio_outputs" --viewer.quit-on-train-completion True \
+        --experiment-name "$dataset_sequence" colmap --data "$nerfstudio_colormap" \
+        --downscale-factor 1
 fi
 
 training_conf_dir=$nerfstudio_outputs/$dataset_sequence/splatfacto
 last_training_ts=$(ls -1t "$training_conf_dir" | head -n1)
 training_conf=$training_conf_dir/$last_training_ts/config.yml
-gaussian_splat_path=$nerfstudio_outputs/splat.ply
+gaussian_splat_path=$nerfstudio_outputs/$dataset_sequence/splat.ply
 if [ ! -f "$gaussian_splat_path" ]; then
     conda run -n nerfstudio ns-export gaussian-splat --load-config "$training_conf" \
         --output-dir "$(dirname "$gaussian_splat_path")" \
@@ -99,7 +102,7 @@ if [ ! -f "$gaussian_splat_path" ]; then
 fi
 
 # Step 4. Render a short trajectory / camera path using the resulting Gaussian Splatting mode
-rendered_video=$nerfstudio_outputs/rendered_$dataset_sequence.mp4
+rendered_video=$nerfstudio_outputs/$dataset_sequence/rendered_$dataset_sequence.mp4
 if [ ! -f "$rendered_video" ]; then
     conda run -n nerfstudio --no-capture-output ns-render camera-path \
         --load-config "$training_conf" --camera-path-filename "$project_root/camera-path.json" \

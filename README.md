@@ -14,7 +14,7 @@ Optional (will be automatically installed if missing):
 - conda 26.1.1
 - [vipe](https://github.com/nv-tlabs/vipe) latest
 
-## Live Demo
+## Live demo
 
 Run task on RunPod.io:
 ```
@@ -29,3 +29,11 @@ The `run-task.sh` script will do the following:
 4. Render a short trajectory / camera path using the resulting Gaussian Splatting model
 
 The script will install all missing dependencies automatically.
+
+## Artifacts
+
+TODO
+
+## Next steps
+
+1. Seems like there is an option to feed frames directly to vipe (i.e. `frame_dir_stream`). Perhaps it's better in one way or another than using mp4 video stream (i.e. `raw_mp4_stream`). Not sure if vipe can preprocess such frame stream on the fly (e.g. changing frame resolution). This requires closer look.
