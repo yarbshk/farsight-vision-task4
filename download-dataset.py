@@ -3,7 +3,7 @@
 Downloads all files from a public Google Drive folder.
 
 This script exists because it does not seem possible to download large public folder automatically
-without some kind of authentication.
+without some kind of authentication. It may also be extended with more performant downloading logic.
 
 Get a free API key at: https://console.developers.google.com
 1. Create project

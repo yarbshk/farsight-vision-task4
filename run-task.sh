@@ -1,4 +1,9 @@
 #!/bin/bash
+# This script is designed in a way to facilitate VIPE Gaussian Splatting Demo testing.
+# It resumes execution at the last successful checkpoint in case of previous execution failure.
+# Checkpoints are not very robust (usually check for the existence of files/directories) not to
+# overcomplicate the script since it's not the point. However those checkpoints are enough to
+# significantly speed up script debugging not to start the script from beginning in case of failure.
 set -e
 
 if [ -z "$GOOGLE_API_KEY" ]; then
@@ -12,7 +17,8 @@ dataset_dir=~/dataset
 dataset_sequence=building_360
 dataset_video=$dataset_dir/$dataset_sequence.mp4
 
-# Step 1. Set up the environment and install all dependencies required to run VIPE
+# Preparation: It sets up a specialized computer environment and downloads a set of photos of
+# a building. It then joins those photos into a video.
 miniconda_root=~/miniconda3
 if [ ! -d "$miniconda_root" ]; then
     miniconda_sh=/tmp/miniconda3.sh
@@ -34,7 +40,6 @@ if [ ! -d "$vipe_dir" ]; then
     conda run -n vipe --no-capture-output pip install --no-build-isolation -e "$vipe_dir"
 fi
 
-# Step 2. Prepare the dataset in the format required by VIPE
 if [ ! -f "$dataset_video" ]; then
     $project_root/download-dataset.py --folder-id 1wPpU0irWLunZCCKR5TSk_bhofioQQ8eV \
         --output-dir "$dataset_dir"
@@ -47,7 +52,8 @@ if [ ! -f "$dataset_video" ]; then
         -pix_fmt yuv420p -vf "scale=1920:-2" "$dataset_video"
 fi
 
-# Step 3. Run VIPE to obtain a Gaussian Splatting representation of the scene
+# Inference: A tool called vipe looks at that video and figures out exactly where the camera
+# was positioned for every frame and how far away everything is.
 pushd "$vipe_dir"
 vipe_results=$vipe_dir/vipe_results
 if [ ! -d "$vipe_results" ]; then
@@ -67,6 +73,8 @@ if [ ! -d "$vipe_results_colormap" ]; then
 fi
 popd
 
+# Training: It uses Gaussian Splatting to "learn" the building's shape, colors, and reflections
+# based on those photos/video frames and camera positions.
 nerfstudio_workdir=~/nerfstudio
 nerfstudio_colormap=$nerfstudio_workdir/colmap
 if [ ! -d "$nerfstudio_colormap" ]; then
@@ -91,6 +99,8 @@ if [ ! -d "$nerfstudio_outputs" ]; then
         --downscale-factor 1
 fi
 
+# Export & Render: It saves the final 3D object and records a "fly-through" video following
+# a cinematic path.
 training_conf_dir=$nerfstudio_outputs/$dataset_sequence/splatfacto
 last_training_ts=$(ls -1t "$training_conf_dir" | head -n1)
 training_conf=$training_conf_dir/$last_training_ts/config.yml
@@ -101,7 +111,6 @@ if [ ! -f "$gaussian_splat_path" ]; then
         --output-filename "$(basename "$gaussian_splat_path")"
 fi
 
-# Step 4. Render a short trajectory / camera path using the resulting Gaussian Splatting mode
 rendered_video=$nerfstudio_outputs/$dataset_sequence/rendered_$dataset_sequence.mp4
 if [ ! -f "$rendered_video" ]; then
     conda run -n nerfstudio --no-capture-output ns-render camera-path \
