@@ -111,9 +111,9 @@ if [ ! -f "$gaussian_splat_path" ]; then
         --output-filename "$(basename "$gaussian_splat_path")"
 fi
 
-rendered_video=$nerfstudio_outputs/$dataset_sequence/rendered_$dataset_sequence.mp4
-if [ ! -f "$rendered_video" ]; then
+fly_through_video=$nerfstudio_outputs/$dataset_sequence/fly-through.mp4
+if [ ! -f "$fly_through_video" ]; then
     conda run -n nerfstudio --no-capture-output ns-render camera-path \
         --load-config "$training_conf" --camera-path-filename "$project_root/camera-path.json" \
-        --output-path "$rendered_video"
+        --output-path "$fly_through_video"
 fi
