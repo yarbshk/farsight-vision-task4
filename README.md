@@ -46,7 +46,7 @@ The script will install all missing dependencies automatically.
 ## Artifacts
 
 - Working VIPE setup (see [Live demo](https://github.com/yarbshk/farsight-vision-task4?tab=readme-ov-file#live-demo) section above)
-- Gaussian Splatting result generated from the dataset
+- [Gaussian Splatting result](https://github.com/yarbshk/farsight-vision-task4/blob/main/splat.ply) generated from the dataset
 - Public [GitHub repo](https://github.com/yarbshk/farsight-vision-task4) with instructions and scripts
 - [Demo video](https://github.com/yarbshk/farsight-vision-task4/blob/main/fly-through.mp4) demonstrating the full pipeline end-to-end
 
